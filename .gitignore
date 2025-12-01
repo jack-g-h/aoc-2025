@@ -1,0 +1,5 @@
+resources/
+.idea/
+.cpcache/
+2025.iml
+.nrepl-port
