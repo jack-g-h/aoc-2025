@@ -1,6 +1,7 @@
 (ns core
-  (:require [day-1.core :as day-1]
-            [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [day-1.core :as day-1]
+            [day-2.core :as day-2]))
 
 (defn day-parser
   [day day-parse-fn]
@@ -17,4 +18,18 @@
 
   (day-1/solve-part-2 (parser "example"))
   (day-1/solve-part-2 (parser "actual"))
+  ,)
+
+;;; Run Day 2
+(comment
+  (def parser (day-parser "day-2" day-2/parse-ranges))
+  (parser "example")
+
+  (mapv day-2/invalid-number? (reduce into (parser "example")))
+
+  (day-2/solve-part-1 (parser "example"))
+  (day-2/solve-part-1 (parser "actual"))
+
+  (day-2/solve-part-2 (parser "example"))
+  (day-2/solve-part-2 (parser "actual"))
   ,)
