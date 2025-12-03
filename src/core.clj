@@ -1,7 +1,8 @@
 (ns core
   (:require [clojure.java.io :as io]
             [day-1.core :as day-1]
-            [day-2.core :as day-2]))
+            [day-2.core :as day-2]
+            [day-3.core :as day-3]))
 
 (defn day-parser
   [day day-parse-fn]
@@ -32,4 +33,16 @@
 
   (day-2/solve-part-2 (parser "example"))
   (day-2/solve-part-2 (parser "actual"))
+  ,)
+
+;;; Run Day 3
+(comment
+  (def parser (day-parser "day-3" day-3/parse-batteries))
+  (parser "example")
+
+  (day-3/solve-part-1 (parser "example"))
+  (day-3/solve-part-1 (parser "actual"))
+
+  (day-3/solve-part-2 (parser "example"))
+  (day-3/solve-part-2 (parser "actual"))
   ,)
