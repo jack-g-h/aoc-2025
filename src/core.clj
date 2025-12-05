@@ -3,7 +3,8 @@
             [day-1.core :as day-1]
             [day-2.core :as day-2]
             [day-3.core :as day-3]
-            [day-4.core :as day-4]))
+            [day-4.core :as day-4]
+            [day-5.core :as day-5]))
 
 (defn day-parser
   [day day-parse-fn]
@@ -58,4 +59,16 @@
 
   (day-4/solve-part-2 (parser "example"))
   (day-4/solve-part-2 (parser "actual"))
+  ,)
+
+;;; Run Day 5
+(comment
+  (def parser (day-parser "day-5" day-5/parse-database))
+  (parser "example")
+
+  (day-5/solve-part-1 (parser "example"))
+  (day-5/solve-part-1 (parser "actual"))
+
+  (day-5/solve-part-2 (parser "example"))
+  (day-5/solve-part-2 (parser "actual"))
   ,)
