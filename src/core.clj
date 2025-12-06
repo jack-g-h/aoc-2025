@@ -4,7 +4,9 @@
             [day-2.core :as day-2]
             [day-3.core :as day-3]
             [day-4.core :as day-4]
-            [day-5.core :as day-5]))
+            [day-5.core :as day-5]
+            [day-6.core :as day-6]
+            [clojure.string]))
 
 (defn day-parser
   [day day-parse-fn]
@@ -69,4 +71,19 @@
 
   (day-5/solve-part-2 (parser-5 "example"))
   (day-5/solve-part-2 (parser-5 "actual"))
+  ,)
+
+;;; Run Day 6
+(comment
+  (def parser-6 (day-parser "day-6" day-6/parser-problems))
+  (parser-6 "example")
+
+  (day-6/solve-part-1 (parser-6 "example"))
+  (day-6/solve-part-1 (parser-6 "actual"))
+
+  (def parser-6-2 (day-parser "day-6" day-6/parser-cephalopod-problems))
+  (parser-6-2 "example")
+
+  (day-6/solve-part-2 (parser-6-2 "example"))
+  (day-6/solve-part-2 (parser-6-2 "actual"))
   ,)
