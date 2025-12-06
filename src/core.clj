@@ -75,15 +75,15 @@
 
 ;;; Run Day 6
 (comment
-  (def parser-6 (day-parser "day-6" day-6/parser-problems))
-  (parser-6 "example")
+  (def parser-6-1 (day-parser "day-6" day-6/parse-human-problems))
+  (parser-6-1 "example")
 
-  (day-6/solve-part-1 (parser-6 "example"))
-  (day-6/solve-part-1 (parser-6 "actual"))
+  (day-6/solve-homework (parser-6-1 "example"))
+  (day-6/solve-homework (parser-6-1 "actual"))
 
-  (def parser-6-2 (day-parser "day-6" day-6/parser-cephalopod-problems))
+  (def parser-6-2 (day-parser "day-6" day-6/parse-cephalopod-problems))
   (parser-6-2 "example")
 
-  (day-6/solve-part-2 (parser-6-2 "example"))
-  (day-6/solve-part-2 (parser-6-2 "actual"))
+  (day-6/solve-homework (parser-6-2 "example"))
+  (day-6/solve-homework (parser-6-2 "actual"))
   ,)

@@ -7,61 +7,57 @@
     "+" +}
    operation-str))
 
-(defn parser-problems
+(defn transpose
+  [matrix]
+  (mapv (fn [column]
+          (mapv #(nth % column) matrix))
+        (range (count (first matrix)))))
+
+(defn string-transpose
+  [strings]
+  (mapv (partial apply str) (transpose strings)))
+
+(defn ensure-length
+  "Ensures that all strings within the provided collection are of the same length by
+   appending spaces to the shorter strings."
+  [strings]
+  (let [max-length (apply max (mapv count strings))]
+    (mapv (fn [to-ensure]
+            (apply str to-ensure (repeat (- max-length (count to-ensure)) " ")))
+          strings)))
+
+(defn partition-and-remove
+  "Partitions by the provided predicate, and then removes all partitions containing any elements
+   that return truthy values under the predicate."
+  [predicate collection]
+  (filterv (partial not-any? predicate)
+           (partition-by predicate collection)))
+
+(defn parse-human-problems
   [file-lines]
   (let [lines (mapv identity file-lines)
         numbers (drop-last lines)
         operations (last lines)]
-    {:numbers (mapv (fn [row]
-                      (mapv #(Long/parseLong %)
-                            (string/split (string/trim row) #" +")))
-                    numbers)
+    {:numbers    (transpose (mapv (fn [row]
+                                    (mapv #(Long/parseLong %)
+                                          (string/split (string/trim row) #" +")))
+                                  numbers))
      :operations (mapv operation-str->function (string/split (string/trim operations) #" +"))}))
 
-(defn solve-problem
-  [homework problem]
-  (reduce (nth (:operations homework) problem)
-          (mapv #(nth % problem) (:numbers homework))))
-
-(defn solve-part-1
-  [homework]
-  (let [problem-count (count (:operations homework))]
-    (reduce + (mapv (partial solve-problem homework) (range problem-count)))))
-
-(defn ensure-length
-  [strings]
-  (let [max-length (apply max (mapv count strings))]
-    (mapv (fn [to-ensure]
-            (if (< (count to-ensure) max-length)
-              (apply str to-ensure (repeat (- max-length (count to-ensure)) " "))
-              to-ensure))
-          strings)))
-
-(defn string-transpose
-  [strings]
-  (mapv (fn [column]
-          (apply str (mapv #(nth % column) strings)))
-        (range (count (first strings)))))
-
-(defn parser-cephalopod-problems
+(defn parse-cephalopod-problems
   [file-lines]
   (let [lines (mapv identity file-lines)
-        numbers (ensure-length (drop-last lines))
-        transposed-numbers (string-transpose numbers)
-        cephalopod-numbers (filterv (partial not-any? (comp empty? clojure.string/trim))
-                                    (partition-by (comp empty? clojure.string/trim)
-                                                  transposed-numbers))
-
+        numbers (string-transpose (ensure-length (drop-last lines)))
         operations (last lines)]
     {:numbers (mapv (fn [row]
                       (mapv (comp #(Long/parseLong %) string/trim)
                             row))
-                    cephalopod-numbers)
+                    (partition-and-remove (comp empty? clojure.string/trim) numbers))
      :operations (mapv operation-str->function (string/split (string/trim operations) #" +"))}))
 
-(defn solve-part-2
-  [cephalopod-homework]
+(defn solve-homework
+  [homework]
   (reduce + (mapv (fn [operation values]
                     (reduce operation values))
-                  (:operations cephalopod-homework)
-                  (:numbers cephalopod-homework))))
+                  (:operations homework)
+                  (:numbers homework))))
