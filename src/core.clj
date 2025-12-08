@@ -6,6 +6,7 @@
             [day-4.core :as day-4]
             [day-5.core :as day-5]
             [day-6.core :as day-6]
+            [day-7.core :as day-7]
             [clojure.string]))
 
 (defn day-parser
@@ -86,4 +87,16 @@
 
   (day-6/solve-homework (parser-6-2 "example"))
   (day-6/solve-homework (parser-6-2 "actual"))
+  ,)
+
+;;; Run Day 7
+(comment
+  (def parser-7 (day-parser "day-7" day-7/parse-tachyon-manifold))
+  (parser-7 "example")
+
+  (day-7/solve-part-1 (parser-7 "example"))
+  (day-7/solve-part-1 (parser-7 "actual"))
+
+  (day-7/solve-part-2 (parser-7 "example"))
+  (day-7/solve-part-2 (parser-7 "actual"))
   ,)
