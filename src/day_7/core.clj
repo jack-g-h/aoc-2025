@@ -55,6 +55,7 @@
   (let [splitless (move-splitless tachyon-manifold layer beam-locations)]
     {:beams (move-splitters beam-locations splitless)
      :new-splits (count (set/difference beam-locations splitless))}))
+(def move-downwards (memoize move-downwards))
 
 (defn solve-part-1
   [tachyon-manifold]
@@ -65,3 +66,20 @@
       splits
       (let [after-move (move-downwards (:manifold tachyon-manifold) y beams)]
         (recur (inc y) (:beams after-move) (+ splits (:new-splits after-move)))))))
+
+(defn count-timelines
+  [tachyon-manifold beam-y beam-x]
+  (if (>= (inc beam-y) (count tachyon-manifold))
+    1
+    (loop [beam-y beam-y]
+      (let [next-beam (:beams (move-downwards tachyon-manifold beam-y #{beam-x}))]
+        (cond
+          (>= beam-y (count tachyon-manifold)) 1
+          (= 1 (count next-beam)) (recur (inc beam-y))
+          :else (reduce + (mapv (partial count-timelines tachyon-manifold (inc beam-y))
+                                next-beam)))))))
+(def count-timelines (memoize count-timelines))
+
+(defn solve-part-2
+  [tachyon-manifold]
+  (count-timelines (:manifold tachyon-manifold) (first (:beam-origin tachyon-manifold)) (second (:beam-origin tachyon-manifold))))
