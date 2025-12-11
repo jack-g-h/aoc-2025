@@ -1,6 +1,7 @@
 (ns day-8.core
   (:require
     [clojure.string :as string]
+    [clojure.set :as set]
     [clojure.math :as math]))
 
 (defn parse-junction-boxes
@@ -15,75 +16,67 @@
   (math/sqrt (reduce + (mapv (comp #(math/pow % 2) -) point-a point-b))))
 (def euclid-distance (memoize euclid-distance))
 
-(defn closest-box
-  [junction-boxes target-box]
-  (let [box-distances (mapv (fn [box]
-                              [(euclid-distance box target-box) box])
-                            junction-boxes)
-        sorted-distances (sort #(compare (first %1) (first %2))
-                               box-distances)]
-    (if (and (zero? (first (first sorted-distances))) (second sorted-distances))
-      (second sorted-distances)
-      (first sorted-distances))))
+(defn box-distances
+  [all-boxes target-box]
+  (zipmap (mapv (partial euclid-distance target-box) all-boxes) all-boxes))
 
-(defn circuit-distance
-  [circuit-a circuit-b]
-  (if (= circuit-a circuit-b)
-    ##Inf
-    (first (first (mapv (partial closest-box circuit-a) circuit-b)))))
-(def circuit-distance (memoize circuit-distance))
+(defn all-box-distances
+  [boxes]
+  (->> boxes
+       (mapv (fn [box]
+               (update-vals (box-distances boxes box) (comp (partial conj #{})
+                                                            (partial conj #{box})))))
+       (apply merge-with into)
+       (into (sorted-map-by <))))
 
-(defn closest-circuit
-  [circuits target-circuit]
-  (let [circuit-distances (mapv (fn [circuit]
-                                  (future [(circuit-distance circuit target-circuit) circuit]))
-                                circuits)
-        sorted-distances (sort #(compare (first %1) (first %2))
-                               (mapv deref circuit-distances))]
-    (if (= 0.0 (first (first sorted-distances)))
-      (second sorted-distances)
-      (first sorted-distances))))
+(defn join-sets-on
+  [sets join-items]
+  (let [untouched (filterv (comp empty? (partial set/intersection join-items))
+                           sets)
+        to-join (filterv (comp not empty? (partial set/intersection join-items))
+                         sets)]
+    (conj untouched (apply set/union to-join))))
 
-(defn closest-circuits
-  [circuits]
-  (loop [distance nil
-         closest nil
-         remaining circuits]
-    (let [closest-to-first (closest-circuit circuits (first remaining))]
-      (cond
-        (empty? remaining)
-        closest
-
-        (or (not distance) (< (first closest-to-first) distance))
-        (recur (first closest-to-first) [(first remaining) (second closest-to-first)] (rest remaining))
-
-        :else
-        (recur distance closest (rest remaining))))))
-
-(defn make-connection
-  [circuits]
-  (let [to-merge (closest-circuits circuits)
-        others (filterv #(and (not= % (first to-merge))
-                              (not= % (second to-merge)))
-                        circuits)]
-    (conj others (apply into to-merge))))
-
-(defn make-n-connections
-  [circuits n]
-  (loop [circuits circuits
-         count 0]
-    (if (zero? (mod count 100))
-      (println count))
-    (if (>= count n)
-      circuits
-      (recur (make-connection circuits) (inc count)))))
+(defn perform-n-links
+  [n boxes box-distances]
+  (loop [remaining-distances (rest (keys box-distances))
+         remaining n
+         circuits (mapv (partial conj #{}) boxes)]
+    (cond
+      (<= remaining 0) circuits
+      :else
+      (let [links (get box-distances (first remaining-distances))
+            linked-circuits (reduce join-sets-on circuits (take remaining links))]
+        (recur (rest remaining-distances) (- remaining (count links)) linked-circuits)))))
 
 (defn solve-part-1
   [junction-boxes n]
-  (let [circuits (make-n-connections (mapv (partial conj (set [])) junction-boxes) (dec n))
-        by-size (reverse (sort-by count circuits))]
-    (reduce * (mapv count (take 3 by-size)))))
+  (->> (all-box-distances junction-boxes)
+       (perform-n-links n junction-boxes)
+       (sort-by count >)
+       (take 3)
+       (map count)
+       (reduce *)))
+
+(defn last-connection
+  "This function abuses the fact that for no distance > 0 is there more than
+   one pair of junction boxes (for my input).
+
+   This might be an assumption of the problem as tie conditions aren't
+   detailed, but it is never explicitly stated."
+  [boxes box-distances]
+  (loop [remaining-distances (rest (keys box-distances))
+         circuits (mapv (partial conj #{}) boxes)]
+    (let [links (get box-distances (first remaining-distances))
+          linked-circuits (reduce join-sets-on circuits links)]
+      (if (= 1 (count linked-circuits))
+        links
+        (recur (rest remaining-distances) linked-circuits)))))
 
 (defn solve-part-2
-  []
-  ())
+  [junction-boxes]
+  (->> (all-box-distances junction-boxes)
+       (last-connection junction-boxes)
+       first
+       (mapv first)
+       (reduce *)))
