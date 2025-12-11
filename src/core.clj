@@ -124,7 +124,7 @@
   (day-9/solve-part-1 (parser-9 "example"))
   (day-9/solve-part-1 (parser-9 "actual"))
 
-  (day-98/solve-part-2 (parser-9 "example"))
+  (day-9/solve-part-2 (parser-9 "example"))
   (day-9/solve-part-2 (parser-9 "actual"))
   ,)
 
