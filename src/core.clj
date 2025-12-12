@@ -9,6 +9,7 @@
             [day-7.core :as day-7]
             [day-8.core :as day-8]
             [day-9.core :as day-9]
+            [day-10.core :as day-10]
             [day-11.core :as day-11]
             [clojure.string]))
 
@@ -126,6 +127,18 @@
 
   (day-9/solve-part-2 (parser-9 "example"))
   (day-9/solve-part-2 (parser-9 "actual"))
+  ,)
+
+;;; Run Day 10
+(comment
+  (def parser-10 (day-parser "day-10" day-10/parse-machines))
+  (parser-10 "example")
+
+  (day-10/solve-part-1 (parser-10 "example"))
+  (day-10/solve-part-1 (parser-10 "actual"))
+
+  (day-10/solve-part-2 (parser-10 "example"))
+  (day-10/solve-part-2 (parser-10 "actual"))
   ,)
 
 ;;; Run Day 11
